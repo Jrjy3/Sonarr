@@ -118,6 +118,19 @@ namespace NzbDrone.Core.Test.ParserTests
             result.IsMultiSeason.Should().BeTrue();
         }
 
+        [TestCase("The Series S01-05 WS BDRip X264", new[] { 1, 2, 3, 4, 5 })]
+        [TestCase("Series.Title.S01-S09.1080p.AMZN.WEB-DL", new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 })]
+        [TestCase("Series Title S01 - S07 BluRay 1080p", new[] { 1, 2, 3, 4, 5, 6, 7 })]
+        [TestCase("Series Title S01 S04 (1080p BluRay)", new[] { 1, 2, 3, 4 })]
+        [TestCase("Series Title S02 - S05 1080p", new[] { 2, 3, 4, 5 })]
+        public void should_expand_multi_season_range_to_all_seasons(string postTitle, int[] expectedSeasons)
+        {
+            var result = Parser.Parser.ParseTitle(postTitle);
+            result.IsMultiSeason.Should().BeTrue();
+            result.FullSeason.Should().BeTrue();
+            result.SeasonNumbers.Should().BeEquivalentTo(expectedSeasons);
+        }
+
         [Test]
         public void should_not_parse_season_folders()
         {

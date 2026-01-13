@@ -1064,8 +1064,20 @@ namespace NzbDrone.Core.Parser
 
                 if (seasons.Any())
                 {
-                    // Store all distinct seasons in sorted order for multi-season pack support
-                    result.SeasonNumbers = seasons.Distinct().OrderBy(s => s).ToArray();
+                    var distinctSeasons = seasons.Distinct().OrderBy(s => s).ToArray();
+
+                    // For multi-season full season packs, expand the range to include all seasons
+                    // e.g., S01-S06 should become [1, 2, 3, 4, 5, 6] not just [1, 6]
+                    if (result.IsMultiSeason && result.FullSeason && distinctSeasons.Length >= 2)
+                    {
+                        var minSeason = distinctSeasons.Min();
+                        var maxSeason = distinctSeasons.Max();
+                        result.SeasonNumbers = Enumerable.Range(minSeason, maxSeason - minSeason + 1).ToArray();
+                    }
+                    else
+                    {
+                        result.SeasonNumbers = distinctSeasons;
+                    }
 
                     // If at least one season was parsed use the first season as the season (backward compatibility)
                     result.SeasonNumber = seasons.First();

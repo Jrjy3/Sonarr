@@ -22,4 +22,6 @@ export default interface MediaManagement {
   enableMediaInfo: boolean;
   seasonPackUpgrade: string;
   seasonPackUpgradeThreshold: number;
+  multiSeasonPack: string;
+  multiSeasonPackThreshold: number;
 }
