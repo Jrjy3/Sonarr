@@ -137,6 +137,27 @@ const seasonPackUpgradeOptions: EnhancedSelectInputValue<string>[] = [
   },
 ];
 
+const multiSeasonPackOptions: EnhancedSelectInputValue<string>[] = [
+  {
+    key: 'disabled',
+    get value() {
+      return translate('MultiSeasonPackDisabled');
+    },
+  },
+  {
+    key: 'noPreference',
+    get value() {
+      return translate('MultiSeasonPackNoPreference');
+    },
+  },
+  {
+    key: 'preferMultiSeason',
+    get value() {
+      return translate('MultiSeasonPackPrefer');
+    },
+  },
+];
+
 function MediaManagement() {
   const dispatch = useDispatch();
   const showAdvancedSettings = useShowAdvancedSettings();
@@ -475,6 +496,50 @@ function MediaManagement() {
                       </FormGroup>
                     )}
                   </>
+                )}
+
+                <FormGroup
+                  advancedSettings={showAdvancedSettings}
+                  isAdvanced={true}
+                  size={sizes.MEDIUM}
+                >
+                  <FormLabel>{translate('MultiSeasonPackLabel')}</FormLabel>
+                  <FormInputGroup
+                    type={inputTypes.SELECT}
+                    name="multiSeasonPack"
+                    helpText={translate('MultiSeasonPackHelpText')}
+                    helpTextWarning={
+                      settings.multiSeasonPack.value !== 'disabled'
+                        ? translate('MultiSeasonPackWarning')
+                        : undefined
+                    }
+                    values={multiSeasonPackOptions}
+                    onChange={handleInputChange}
+                    {...settings.multiSeasonPack}
+                  />
+                </FormGroup>
+
+                {settings.multiSeasonPack.value !== 'disabled' && (
+                  <FormGroup
+                    advancedSettings={showAdvancedSettings}
+                    isAdvanced={true}
+                    size={sizes.MEDIUM}
+                  >
+                    <FormLabel>
+                      {translate('MultiSeasonPackThresholdLabel')}
+                    </FormLabel>
+                    <FormInputGroup
+                      type={inputTypes.FLOAT}
+                      name="multiSeasonPackThreshold"
+                      unit="%"
+                      step={0.01}
+                      min={0}
+                      max={100}
+                      helpText={translate('MultiSeasonPackThresholdHelpText')}
+                      onChange={handleInputChange}
+                      {...settings.multiSeasonPackThreshold}
+                    />
+                  </FormGroup>
                 )}
               </FieldSet>
             ) : null}

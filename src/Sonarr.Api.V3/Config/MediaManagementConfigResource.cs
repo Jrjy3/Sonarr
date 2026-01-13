@@ -33,6 +33,8 @@ namespace Sonarr.Api.V3.Config
         public string UserRejectedExtensions { get; set; }
         public SeasonPackUpgradeType SeasonPackUpgrade { get; set; }
         public double SeasonPackUpgradeThreshold { get; set; }
+        public MultiSeasonPackType MultiSeasonPack { get; set; }
+        public double MultiSeasonPackThreshold { get; set; }
     }
 
     public static class MediaManagementConfigResourceMapper
@@ -65,7 +67,9 @@ namespace Sonarr.Api.V3.Config
                 EnableMediaInfo = model.EnableMediaInfo,
                 UserRejectedExtensions = model.UserRejectedExtensions,
                 SeasonPackUpgrade = model.SeasonPackUpgrade,
-                SeasonPackUpgradeThreshold = model.SeasonPackUpgradeThreshold
+                SeasonPackUpgradeThreshold = model.SeasonPackUpgradeThreshold,
+                MultiSeasonPack = model.MultiSeasonPack,
+                MultiSeasonPackThreshold = model.MultiSeasonPackThreshold
             };
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Indexers;
+using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Delay;
 using NzbDrone.Core.Qualities;
@@ -99,6 +100,19 @@ namespace NzbDrone.Core.DecisionEngine
 
         private int CompareEpisodeCount(DownloadDecision x, DownloadDecision y)
         {
+            // If PreferMultiSeason is enabled, prefer multi-season packs over single season packs
+            if (_configService.MultiSeasonPack == MultiSeasonPackType.PreferMultiSeason)
+            {
+                var multiSeasonCompare = CompareBy(x.RemoteEpisode,
+                    y.RemoteEpisode,
+                    remoteEpisode => remoteEpisode.ParsedEpisodeInfo.IsMultiSeason);
+
+                if (multiSeasonCompare != 0)
+                {
+                    return multiSeasonCompare;
+                }
+            }
+
             var seasonPackCompare = CompareBy(x.RemoteEpisode,
                 y.RemoteEpisode,
                 remoteEpisode => remoteEpisode.ParsedEpisodeInfo.FullSeason);

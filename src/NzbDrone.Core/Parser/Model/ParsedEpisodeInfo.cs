@@ -14,6 +14,7 @@ namespace NzbDrone.Core.Parser.Model
         public SeriesTitleInfo SeriesTitleInfo { get; set; }
         public QualityModel Quality { get; set; }
         public int SeasonNumber { get; set; }
+        public int[] SeasonNumbers { get; set; }
         public int[] EpisodeNumbers { get; set; }
         public int[] AbsoluteEpisodeNumbers { get; set; }
         public decimal[] SpecialAbsoluteEpisodeNumbers { get; set; }
@@ -37,6 +38,7 @@ namespace NzbDrone.Core.Parser.Model
             EpisodeNumbers = Array.Empty<int>();
             AbsoluteEpisodeNumbers = Array.Empty<int>();
             SpecialAbsoluteEpisodeNumbers = Array.Empty<decimal>();
+            SeasonNumbers = Array.Empty<int>();
             Languages = new List<Language>();
         }
 
@@ -103,6 +105,11 @@ namespace NzbDrone.Core.Parser.Model
                 if (EpisodeNumbers.Length == 1 || AbsoluteEpisodeNumbers.Length == 1)
                 {
                     return Model.ReleaseType.SingleEpisode;
+                }
+
+                if (IsMultiSeason && FullSeason)
+                {
+                    return Model.ReleaseType.MultiSeasonPack;
                 }
 
                 if (FullSeason)

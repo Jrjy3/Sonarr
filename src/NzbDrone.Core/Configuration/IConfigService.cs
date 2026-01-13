@@ -47,6 +47,10 @@ namespace NzbDrone.Core.Configuration
         SeasonPackUpgradeType SeasonPackUpgrade { get; set; }
         double SeasonPackUpgradeThreshold { get; set; }
 
+        // Multi-Season Pack (Media Management)
+        MultiSeasonPackType MultiSeasonPack { get; set; }
+        double MultiSeasonPackThreshold { get; set; }
+
         // Permissions (Media Management)
         bool SetPermissionsLinux { get; set; }
         string ChmodFolder { get; set; }

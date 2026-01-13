@@ -275,6 +275,18 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("SeasonPackUpgradeThreshold", value); }
         }
 
+        public MultiSeasonPackType MultiSeasonPack
+        {
+            get { return GetValueEnum("MultiSeasonPack", MultiSeasonPackType.Disabled); }
+            set { SetValue("MultiSeasonPack", value); }
+        }
+
+        public double MultiSeasonPackThreshold
+        {
+            get { return GetValueDouble("MultiSeasonPackThreshold", 50.0); }
+            set { SetValue("MultiSeasonPackThreshold", value); }
+        }
+
         public bool SetPermissionsLinux
         {
             get { return GetValueBoolean("SetPermissionsLinux", false); }

@@ -57,17 +57,28 @@ namespace NzbDrone.Core.Parser.Model
 
                 if (seasons.Empty())
                 {
-                    throw new InvalidSeasonException("Expected one season, but found none");
+                    throw new InvalidSeasonException("Expected at least one season, but found none");
                 }
 
+                // For multi-season files, return the first (lowest) season number for backward compatibility
                 if (seasons.Count > 1)
                 {
-                    throw new InvalidSeasonException("Expected one season, but found {0} ({1})", seasons.Count, string.Join(", ", seasons));
+                    return seasons.Min();
                 }
 
                 return seasons.Single();
             }
         }
+
+        public int[] SeasonNumbers
+        {
+            get
+            {
+                return Episodes.Select(c => c.SeasonNumber).Distinct().OrderBy(s => s).ToArray();
+            }
+        }
+
+        public bool IsMultiSeason => SeasonNumbers.Length > 1;
 
         public bool IsSpecial => SeasonNumber == 0;
 

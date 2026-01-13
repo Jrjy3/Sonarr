@@ -223,6 +223,31 @@ namespace NzbDrone.Core.Parser
         {
             if (parsedEpisodeInfo.FullSeason)
             {
+                // Handle multi-season packs by fetching episodes from all seasons
+                if (parsedEpisodeInfo.IsMultiSeason && parsedEpisodeInfo.SeasonNumbers.Length > 0)
+                {
+                    var allEpisodes = new List<Episode>();
+
+                    foreach (var seasonNumber in parsedEpisodeInfo.SeasonNumbers)
+                    {
+                        if (series.UseSceneNumbering && sceneSource)
+                        {
+                            var sceneEpisodes = _episodeService.GetEpisodesBySceneSeason(series.Id, seasonNumber);
+
+                            if (sceneEpisodes.Any())
+                            {
+                                allEpisodes.AddRange(sceneEpisodes);
+                                continue;
+                            }
+                        }
+
+                        allEpisodes.AddRange(_episodeService.GetEpisodesBySeason(series.Id, seasonNumber));
+                    }
+
+                    return allEpisodes;
+                }
+
+                // Single season pack
                 if (series.UseSceneNumbering && sceneSource)
                 {
                     var episodes = _episodeService.GetEpisodesBySceneSeason(series.Id, mappedSeasonNumber);
