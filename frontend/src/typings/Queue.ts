@@ -51,6 +51,8 @@ interface Queue extends ModelBase {
   downloadClientHasPostImportCategory: boolean;
   isFullSeason: boolean;
   episode?: Episode;
+  episodes?: Episode[];
+  episodesWithFilesCount: number;
 }
 
 export default Queue;

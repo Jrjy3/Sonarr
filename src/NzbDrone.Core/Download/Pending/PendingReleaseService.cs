@@ -47,7 +47,8 @@ namespace NzbDrone.Core.Download.Pending
                                          IHandle<RssSyncCompleteEvent>,
                                          IHandle<QualityProfileUpdatedEvent>,
                                          IHandle<ConfigSavedEvent>,
-                                         IHandle<ApplicationStartedEvent>
+                                         IHandle<ApplicationStartedEvent>,
+                                         IHandle<QueueUpdatedEvent>
     {
         private readonly IIndexerStatusService _indexerStatusService;
         private readonly IPendingReleaseRepository _repository;
@@ -60,6 +61,7 @@ namespace NzbDrone.Core.Download.Pending
         private readonly IRemoteEpisodeAggregationService _aggregationService;
         private readonly IDownloadClientFactory _downloadClientFactory;
         private readonly IIndexerFactory _indexerFactory;
+        private readonly IQueueService _queueService;
         private readonly IEventAggregator _eventAggregator;
         private readonly Logger _logger;
 
@@ -76,6 +78,7 @@ namespace NzbDrone.Core.Download.Pending
                                     IRemoteEpisodeAggregationService aggregationService,
                                     IDownloadClientFactory downloadClientFactory,
                                     IIndexerFactory indexerFactory,
+                                    IQueueService queueService,
                                     IEventAggregator eventAggregator,
                                     Logger logger)
         {
@@ -90,6 +93,7 @@ namespace NzbDrone.Core.Download.Pending
             _aggregationService = aggregationService;
             _downloadClientFactory = downloadClientFactory;
             _indexerFactory = indexerFactory;
+            _queueService = queueService;
             _eventAggregator = eventAggregator;
             _logger = logger;
         }
@@ -689,6 +693,58 @@ namespace NzbDrone.Core.Download.Pending
         public void Handle(ConfigSavedEvent message)
         {
             UpdatePendingReleases();
+        }
+
+        public void Handle(QueueUpdatedEvent message)
+        {
+            // Remove pending releases for episodes that are already actively downloading
+            RemoveDownloading();
+        }
+
+        private void RemoveDownloading()
+        {
+            var queue = _queueService.GetQueue();
+
+            if (!queue.Any())
+            {
+                return;
+            }
+
+            // Get all episode IDs currently in the active download queue
+            var downloadingEpisodeIds = queue
+                .Where(q => q.RemoteEpisode?.Episodes != null)
+                .SelectMany(q => q.RemoteEpisode.Episodes.Select(e => e.Id))
+                .ToHashSet();
+
+            if (!downloadingEpisodeIds.Any())
+            {
+                return;
+            }
+
+            var pendingReleases = GetPendingReleases();
+            var releasesToRemove = new List<PendingRelease>();
+
+            foreach (var pendingRelease in pendingReleases)
+            {
+                var pendingEpisodeIds = pendingRelease.RemoteEpisode?.Episodes?.Select(e => e.Id) ?? Enumerable.Empty<int>();
+
+                // If all episodes in this pending release are already downloading, remove it
+                if (pendingEpisodeIds.Any() && pendingEpisodeIds.All(downloadingEpisodeIds.Contains))
+                {
+                    _logger.Debug("Removing pending release '{0}' because all episodes are already downloading.", pendingRelease.Title);
+                    releasesToRemove.Add(pendingRelease);
+                }
+            }
+
+            foreach (var release in releasesToRemove)
+            {
+                Delete(release);
+            }
+
+            if (releasesToRemove.Any())
+            {
+                UpdatePendingReleases();
+            }
         }
 
         private static Func<PendingRelease, bool> MatchingReleasePredicate(ReleaseInfo release)
