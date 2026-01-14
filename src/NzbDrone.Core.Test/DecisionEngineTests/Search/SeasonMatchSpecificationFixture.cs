@@ -122,5 +122,35 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.Search
 
             Subject.IsSatisfiedBy(_remoteEpisode, information).Accepted.Should().BeFalse();
         }
+
+        [Test]
+        public void should_fall_back_to_season_number_when_multi_season_with_empty_season_numbers()
+        {
+            _remoteEpisode.ParsedEpisodeInfo = new ParsedEpisodeInfo
+            {
+                SeasonNumber = 3,
+                IsMultiSeason = true,
+                SeasonNumbers = System.Array.Empty<int>()
+            };
+            _searchCriteria.SeasonNumber = 3;
+
+            // When IsMultiSeason is true but SeasonNumbers is empty, should fall back to single-season check
+            Subject.IsSatisfiedBy(_remoteEpisode, _information).Accepted.Should().BeTrue();
+        }
+
+        [Test]
+        public void should_reject_when_multi_season_with_empty_season_numbers_and_wrong_season()
+        {
+            _remoteEpisode.ParsedEpisodeInfo = new ParsedEpisodeInfo
+            {
+                SeasonNumber = 3,
+                IsMultiSeason = true,
+                SeasonNumbers = System.Array.Empty<int>()
+            };
+            _searchCriteria.SeasonNumber = 5;
+
+            // When IsMultiSeason is true but SeasonNumbers is empty, should fall back to single-season check
+            Subject.IsSatisfiedBy(_remoteEpisode, _information).Accepted.Should().BeFalse();
+        }
     }
 }

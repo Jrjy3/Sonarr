@@ -697,7 +697,10 @@ namespace NzbDrone.Core.Download.Pending
 
         public void Handle(QueueUpdatedEvent message)
         {
-            // Remove pending releases for episodes that are already actively downloading
+            // Remove pending releases for episodes that are already actively downloading.
+            // Note: This creates a dependency where PendingReleaseService calls IQueueService.GetQueue()
+            // in response to QueueUpdatedEvent. This is safe because QueueService publishes the event
+            // after updating its state, and this handler only reads from the queue (no circular updates).
             RemoveDownloading();
         }
 

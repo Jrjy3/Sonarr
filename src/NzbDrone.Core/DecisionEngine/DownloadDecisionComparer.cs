@@ -105,7 +105,7 @@ namespace NzbDrone.Core.DecisionEngine
             {
                 var multiSeasonCompare = CompareBy(x.RemoteEpisode,
                     y.RemoteEpisode,
-                    remoteEpisode => remoteEpisode.ParsedEpisodeInfo.IsMultiSeason);
+                    remoteEpisode => remoteEpisode.ParsedEpisodeInfo?.IsMultiSeason ?? false);
 
                 if (multiSeasonCompare != 0)
                 {

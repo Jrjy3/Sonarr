@@ -47,7 +47,8 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
             var parsedInfo = remoteEpisode.ParsedEpisodeInfo;
 
             // For multi-season packs, check if the searched season is within the pack's season range
-            if (parsedInfo.IsMultiSeason && parsedInfo.SeasonNumbers != null && parsedInfo.SeasonNumbers.Length > 0)
+            // SeasonNumbers is initialized to Array.Empty<int>() in ParsedEpisodeInfo constructor, so null check is unnecessary
+            if (parsedInfo.IsMultiSeason && parsedInfo.SeasonNumbers.Length > 0)
             {
                 if (!parsedInfo.SeasonNumbers.Contains(searchedSeason.Value))
                 {

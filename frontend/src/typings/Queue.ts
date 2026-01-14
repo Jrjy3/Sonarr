@@ -52,7 +52,7 @@ interface Queue extends ModelBase {
   isFullSeason: boolean;
   episode?: Episode;
   episodes?: Episode[];
-  episodesWithFilesCount: number;
+  episodesWithFilesCount?: number;
 }
 
 export default Queue;

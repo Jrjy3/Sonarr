@@ -141,5 +141,20 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
 
             Subject.IsSatisfiedBy(_remoteEpisode, new()).Accepted.Should().BeFalse();
         }
+
+        [Test]
+        public void should_return_true_when_threshold_exactly_met()
+        {
+            Mocker.GetMock<IConfigService>()
+                .Setup(s => s.MultiSeasonPack)
+                .Returns(MultiSeasonPackType.NoPreference);
+
+            Mocker.GetMock<IConfigService>()
+                .Setup(s => s.MultiSeasonPackThreshold)
+                .Returns(60.0);
+
+            // 3 out of 5 seasons are monitored = 60%, threshold is exactly 60%
+            Subject.IsSatisfiedBy(_remoteEpisode, new()).Accepted.Should().BeTrue();
+        }
     }
 }

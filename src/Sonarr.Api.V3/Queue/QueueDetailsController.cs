@@ -54,8 +54,10 @@ namespace Sonarr.Api.V3.Queue
             if (episodeIds.Any())
             {
                 // For multi-season packs, check if any episode in the queue item matches
-                return fullQueue.Where(q => q.Episodes != null && q.Episodes.Any() &&
-                                            q.Episodes.Any(e => episodeIds.Contains(e.Id))).ToResource(includeSeries, includeEpisode);
+                // Fall back to single Episode for backward compatibility with non-multi-season items
+                return fullQueue.Where(q =>
+                    (q.Episodes != null && q.Episodes.Any(e => episodeIds.Contains(e.Id))) ||
+                    (q.Episode != null && episodeIds.Contains(q.Episode.Id))).ToResource(includeSeries, includeEpisode);
             }
 
             return fullQueue.ToResource(includeSeries, includeEpisode);

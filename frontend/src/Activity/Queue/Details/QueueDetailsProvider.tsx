@@ -94,11 +94,16 @@ export function useQueueDetailsForSeries(
         }
 
         // For multi-season packs, check if the season is in the seasonNumbers array
-        if (
-          seasonNumber != null &&
-          !item.seasonNumbers?.includes(seasonNumber)
-        ) {
-          return acc;
+        // Fall back to single seasonNumber for backward compatibility with legacy queue items
+        if (seasonNumber != null) {
+          const hasSeasonNumbers = item.seasonNumbers?.length > 0;
+          const matchesSeason = hasSeasonNumbers
+            ? item.seasonNumbers.includes(seasonNumber)
+            : item.seasonNumber === seasonNumber;
+
+          if (!matchesSeason) {
+            return acc;
+          }
         }
 
         // Count actual episodes, not queue items, and deduplicate by episode ID
@@ -125,7 +130,9 @@ export function useQueueDetailsForSeries(
               (e) => newEpisodeIds.includes(e.id) && e.hasFile
             ).length;
           } else {
-            // Proportionally estimate if we only have the count
+            // Fallback: proportionally estimate episodesWithFiles when the episodes array
+            // is not available (e.g., when includeSubresources doesn't include Episodes).
+            // This may be inaccurate if episode file distribution is uneven across the pack.
             const ratio = newEpisodeIds.length / item.episodeIds.length;
             acc.episodesWithFiles += Math.round((item.episodesWithFilesCount ?? 0) * ratio);
           }
