@@ -89,7 +89,11 @@ export function useQueueDetailsForSeries(
           return acc;
         }
 
-        if (seasonNumber != null && item.seasonNumber !== seasonNumber) {
+        // For multi-season packs, check if the season is in the seasonNumbers array
+        if (
+          seasonNumber != null &&
+          !item.seasonNumbers?.includes(seasonNumber)
+        ) {
           return acc;
         }
 

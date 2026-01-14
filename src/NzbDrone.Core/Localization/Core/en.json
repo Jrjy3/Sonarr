@@ -1911,6 +1911,7 @@
   "SeasonNumber": "Season Number",
   "SeasonNumberToken": "Season {seasonNumber}",
   "SeasonPack": "Season Pack",
+  "SeasonsRange": "Seasons {firstSeason}-{lastSeason}",
   "SeasonPassEpisodesDownloaded": "{episodeFileCount}/{totalEpisodeCount} episodes downloaded",
   "SeasonPassTruncated": "Only latest 25 seasons are shown, go to details to see all seasons",
   "SeasonPremiere": "Season Premiere",

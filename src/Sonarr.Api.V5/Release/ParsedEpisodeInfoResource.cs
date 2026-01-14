@@ -9,7 +9,9 @@ public class ParsedEpisodeInfoResource
     public string? ReleaseGroup { get; set; }
     public string? ReleaseHash { get; set; }
     public bool FullSeason { get; set; }
+    public bool IsMultiSeason { get; set; }
     public int SeasonNumber { get; set; }
+    public int[] SeasonNumbers { get; set; } = [];
     public string? AirDate { get; set; }
     public string? SeriesTitle { get; set; }
     public int[] EpisodeNumbers { get; set; } = [];
@@ -30,7 +32,9 @@ public static class ParsedEpisodeInfoResourceMapper
             ReleaseGroup = parsedEpisodeInfo.ReleaseGroup,
             ReleaseHash = parsedEpisodeInfo.ReleaseHash,
             FullSeason = parsedEpisodeInfo.FullSeason,
+            IsMultiSeason = parsedEpisodeInfo.IsMultiSeason,
             SeasonNumber = parsedEpisodeInfo.SeasonNumber,
+            SeasonNumbers = parsedEpisodeInfo.SeasonNumbers ?? [],
             AirDate = parsedEpisodeInfo.AirDate,
             SeriesTitle = parsedEpisodeInfo.SeriesTitle,
             EpisodeNumbers = parsedEpisodeInfo.EpisodeNumbers,

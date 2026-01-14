@@ -18,9 +18,12 @@ namespace Sonarr.Api.V3.Queue
     {
         public int? SeriesId { get; set; }
         public int? EpisodeId { get; set; }
+        public List<int> EpisodeIds { get; set; }
         public int? SeasonNumber { get; set; }
+        public List<int> SeasonNumbers { get; set; }
         public SeriesResource Series { get; set; }
         public EpisodeResource Episode { get; set; }
+        public List<EpisodeResource> Episodes { get; set; }
         public List<Language> Languages { get; set; }
         public QualityModel Quality { get; set; }
         public List<CustomFormatResource> CustomFormats { get; set; }
@@ -66,14 +69,26 @@ namespace Sonarr.Api.V3.Queue
             var customFormats = model.RemoteEpisode?.CustomFormats;
             var customFormatScore = model.Series?.QualityProfile?.Value?.CalculateCustomFormatScore(customFormats) ?? 0;
 
+            // For multi-season packs, get all unique season numbers from the episodes
+            var seasonNumbers = model.Episodes?.Select(e => e.SeasonNumber).Distinct().OrderBy(s => s).ToList() ?? new List<int>();
+
+            // Fall back to the single season number if no episodes
+            if (!seasonNumbers.Any() && model.Episode?.SeasonNumber != null)
+            {
+                seasonNumbers = new List<int> { model.Episode.SeasonNumber };
+            }
+
             return new QueueResource
             {
                 Id = model.Id,
                 SeriesId = model.Series?.Id,
                 EpisodeId = model.Episode?.Id,
+                EpisodeIds = model.Episodes?.Select(e => e.Id).ToList() ?? new List<int>(),
                 SeasonNumber = model.Episode?.SeasonNumber,
+                SeasonNumbers = seasonNumbers,
                 Series = includeSeries && model.Series != null ? model.Series.ToResource() : null,
                 Episode = includeEpisode && model.Episode != null ? model.Episode.ToResource() : null,
+                Episodes = includeEpisode ? model.Episodes?.ToResource() : null,
                 Languages = model.Languages,
                 Quality = model.Quality,
                 CustomFormats = customFormats?.ToResource(false),

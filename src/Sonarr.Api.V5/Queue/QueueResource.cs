@@ -49,12 +49,21 @@ namespace Sonarr.Api.V5.Queue
             var customFormats = model.RemoteEpisode?.CustomFormats;
             var customFormatScore = model.Series?.QualityProfile?.Value?.CalculateCustomFormatScore(customFormats) ?? 0;
 
+            // For multi-season packs, get all unique season numbers from the episodes
+            var seasonNumbers = model.Episodes?.Select(e => e.SeasonNumber).Distinct().OrderBy(s => s).ToList() ?? [];
+
+            // Fall back to the single season number if no episodes
+            if (!seasonNumbers.Any() && model.SeasonNumber.HasValue)
+            {
+                seasonNumbers = [model.SeasonNumber.Value];
+            }
+
             return new QueueResource
             {
                 Id = model.Id,
                 SeriesId = model.Series?.Id,
                 EpisodeIds = model.Episodes?.Select(e => e.Id).ToList() ?? [],
-                SeasonNumbers = model.SeasonNumber.HasValue ? [model.SeasonNumber.Value] : [],
+                SeasonNumbers = seasonNumbers,
                 Series = includeSeries && model.Series != null ? model.Series.ToResource() : null,
                 Episodes = includeEpisodes ? model.Episodes?.ToResource() : null,
                 Languages = model.Languages,

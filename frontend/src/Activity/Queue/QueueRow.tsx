@@ -221,6 +221,7 @@ function QueueRow(props: QueueRowProps) {
                 episodes={episodes}
                 isFullSeason={isFullSeason}
                 seasonNumber={seasonNumbers[0]}
+                seasonNumbers={seasonNumbers}
                 series={series}
               />
             </TableRowCell>

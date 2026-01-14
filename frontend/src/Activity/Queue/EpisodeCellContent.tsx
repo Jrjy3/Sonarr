@@ -8,6 +8,7 @@ interface EpisodeCellContentProps {
   episodes: Episode[];
   isFullSeason: boolean;
   seasonNumber?: number;
+  seasonNumbers?: number[];
   series?: Series;
 }
 
@@ -15,10 +16,22 @@ export default function EpisodeCellContent({
   episodes,
   isFullSeason,
   seasonNumber,
+  seasonNumbers,
   series,
 }: EpisodeCellContentProps) {
   if (episodes.length === 0) {
     return '-';
+  }
+
+  // Handle multi-season packs
+  if (isFullSeason && seasonNumbers && seasonNumbers.length > 1) {
+    const minSeason = Math.min(...seasonNumbers);
+    const maxSeason = Math.max(...seasonNumbers);
+
+    return translate('SeasonsRange', {
+      firstSeason: minSeason,
+      lastSeason: maxSeason,
+    });
   }
 
   if (isFullSeason && seasonNumber != null) {
